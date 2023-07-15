@@ -154,23 +154,29 @@ function Home() {
           </ul>
         </div>
 
-        <div>
-          <p className="text-4xl font-bold mb-8">{`${Math.floor(
-            (timeRemaining % 3600) / 60,
-          )
-            .toString()
-            .padStart(2, "0")}:${Math.floor(timeRemaining % 60)
-            .toString()
-            .padStart(2, "0")}`}</p>
-          <p className="text-2xl font-bold mb-8">
-            Current Participant: {currentParticipant}
+        <div className="min-w-[300px]">
+          <div className="mb-8 flex justify-between items-center">
+            <p className="text-4xl font-bold">{`${Math.floor(
+              (timeRemaining % 3600) / 60,
+            )
+              .toString()
+              .padStart(2, "0")}:${Math.floor(timeRemaining % 60)
+              .toString()
+              .padStart(2, "0")}`}</p>
+            <Button onClick={toggleTimerRunning}>
+              {timerRunning ? "Pause" : "Start"}
+            </Button>
+          </div>
+          <p>
+            {onBreak ? (
+              <div className="font-semibold text-3xl">Time to take a break</div>
+            ) : (
+              <div>
+                <h3 className="font-bold">Driver</h3>
+                <p className="font-semibold text-4xl">{currentParticipant}</p>
+              </div>
+            )}
           </p>
-          <p className="text-2xl font-bold mb-8">
-            {onBreak ? "On break" : "Working"}
-          </p>
-          <Button onClick={toggleTimerRunning}>
-            {timerRunning ? "Pause" : "Start"}
-          </Button>
         </div>
       </div>
     </main>
