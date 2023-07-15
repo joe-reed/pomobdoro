@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
+import { X } from "lucide-react";
 
 function Home() {
   const [name, setName] = React.useState("");
@@ -22,6 +23,12 @@ function Home() {
     setParticipants(newParticipants);
     setName("");
 
+    localStorage.setItem("participants", JSON.stringify(newParticipants));
+  }
+
+  function removeParticipant(participant: string) {
+    const newParticipants = participants.filter((p) => p !== participant);
+    setParticipants(newParticipants);
     localStorage.setItem("participants", JSON.stringify(newParticipants));
   }
 
@@ -47,7 +54,16 @@ function Home() {
 
       <ul className="flex flex-col space-y-1">
         {participants.map((participant) => (
-          <li key={participant}>{participant}</li>
+          <li key={participant}>
+            <div className="flex items-center">
+              <p className="mr-4">{participant}</p>
+              <X
+                className="mt-[1px]"
+                size={16}
+                onClick={() => removeParticipant(participant)}
+              />
+            </div>
+          </li>
         ))}
       </ul>
     </main>
