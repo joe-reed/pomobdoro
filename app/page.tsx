@@ -128,24 +128,35 @@ function Home() {
     localStorage.setItem("timerRunning", JSON.stringify(!timerRunning));
   }
 
+  function startWorking() {
+    setOnBreak(false);
+    rotateCurrentParticipant();
+    updateTimeRemaining(workingTime);
+  }
+
+  function startBreak() {
+    setOnBreak(true);
+    updateTimeRemaining(breakTime);
+  }
+
+  function toggleBreakOrWork() {
+    if (onBreak) {
+      startWorking();
+    } else {
+      startBreak();
+    }
+  }
+
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!timerRunning) return;
 
-      let newTimeRemaining = timeRemaining - 1;
-
-      if (timeRemaining <= 0) {
-        if (onBreak) {
-          setOnBreak(false);
-          rotateCurrentParticipant();
-          newTimeRemaining = workingTime;
-        } else {
-          setOnBreak(true);
-          newTimeRemaining = breakTime;
-        }
+      if (timeRemaining > 0) {
+        updateTimeRemaining(timeRemaining - 1);
+        return;
       }
 
-      updateTimeRemaining(newTimeRemaining);
+      toggleBreakOrWork();
     }, 1000);
 
     return () => clearInterval(interval);
@@ -168,12 +179,16 @@ function Home() {
     }
   }
 
+  function skip() {
+    toggleBreakOrWork();
+  }
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-4xl font-bold mb-8">Pomobdoro</h1>
 
       <div className="flex">
-        <div className="mr-32">
+        <div className="w-1/2">
           <form onSubmit={addParticipant} className="mb-5">
             <div className="flex space-x-4 items-end">
               <div className="flex flex-col">
@@ -265,18 +280,16 @@ function Home() {
           </fieldset>
         </div>
 
-        <div className="min-w-[300px] mr-3">
+        <div className="w-1/2">
           <div className="mb-8 flex justify-between items-center">
             <p className="text-4xl font-bold">{`${getMinutes(timeRemaining)
               .toString()
               .padStart(2, "0")}:${getSeconds(timeRemaining)
               .toString()
               .padStart(2, "0")}`}</p>
-            <Button onClick={toggleTimerRunning}>
-              {timerRunning ? "Pause" : "Start"}
-            </Button>
           </div>
-          <p>
+
+          <div className="mb-8 h-1/3">
             {onBreak ? (
               <div className="font-semibold text-3xl">Time to take a break</div>
             ) : (
@@ -285,11 +298,21 @@ function Home() {
                 <p className="font-semibold text-4xl">{currentParticipant}</p>
               </div>
             )}
-          </p>
-        </div>
+          </div>
 
-        <div>
-          <Button onClick={reset}>Reset</Button>
+          <Button onClick={toggleTimerRunning} className="mb-3 w-1/3">
+            {timerRunning ? "Pause" : "Start"}
+          </Button>
+
+          <div className="flex w-1/3 justify-around">
+            <Button onClick={reset} className="flex" variant="secondary">
+              Reset
+            </Button>
+
+            <Button onClick={skip} variant="secondary">
+              Skip
+            </Button>
+          </div>
         </div>
       </div>
     </main>
