@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import { X } from "lucide-react";
 
-const WORKING_TIME = 25 * 60;
-const BREAK_TIME = 5 * 60;
+const DEFAULT_WORKING_TIME = 25 * 60;
+const DEFAULT_BREAK_TIME = 5 * 60;
 
 function Home() {
   const [name, setName] = React.useState("");
@@ -22,11 +22,21 @@ function Home() {
   const [timerRunning, setTimerRunning] = React.useState<boolean>(
     JSON.parse(localStorage.getItem("timerRunning") || "false"),
   );
-  const [timeRemaining, setTimeRemaining] = React.useState<number>(
-    parseInt(localStorage.getItem("timeRemaining") || WORKING_TIME.toString()),
-  );
   const [onBreak, setOnBreak] = React.useState<boolean>(
     JSON.parse(localStorage.getItem("onBreak") || "false"),
+  );
+  const [workingTime, setWorkingTime] = React.useState<number>(
+    parseInt(
+      localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString(),
+    ),
+  );
+  const [breakTime, setBreakTime] = React.useState<number>(
+    parseInt(
+      localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString(),
+    ),
+  );
+  const [timeRemaining, setTimeRemaining] = React.useState<number>(
+    parseInt(localStorage.getItem("timeRemaining") || workingTime.toString()),
   );
 
   function addParticipant(e: React.FormEvent<HTMLFormElement>) {
@@ -82,6 +92,16 @@ function Home() {
     localStorage.setItem("currentParticipant", participant || "");
   }
 
+  function updateWorkingTime(newWorkingTime: number) {
+    setWorkingTime(newWorkingTime);
+    localStorage.setItem("workingTime", newWorkingTime.toString());
+  }
+
+  function updateBreakTime(newBreakTime: number) {
+    setBreakTime(newBreakTime);
+    localStorage.setItem("breakTime", newBreakTime.toString());
+  }
+
   function updateTimeRemaining(newTimeRemaining: number) {
     setTimeRemaining(newTimeRemaining);
     localStorage.setItem("timeRemaining", newTimeRemaining.toString());
@@ -102,10 +122,10 @@ function Home() {
         if (onBreak) {
           setOnBreak(false);
           rotateCurrentParticipant();
-          newTimeRemaining = WORKING_TIME;
+          newTimeRemaining = workingTime;
         } else {
           setOnBreak(true);
-          newTimeRemaining = BREAK_TIME;
+          newTimeRemaining = breakTime;
         }
       }
 
@@ -138,7 +158,7 @@ function Home() {
             </div>
           </form>
 
-          <ul className="flex flex-col space-y-1">
+          <ul className="flex flex-col space-y-1 mb-8">
             {participants.map((participant) => (
               <li key={participant}>
                 <div className="flex items-center">
@@ -152,6 +172,26 @@ function Home() {
               </li>
             ))}
           </ul>
+
+          <div>
+            <Label htmlFor="working-time">Working time</Label>
+            <Input
+              type="number"
+              id="working-time"
+              value={workingTime}
+              onChange={(e) => updateWorkingTime(parseInt(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="break-time">Break time</Label>
+            <Input
+              type="number"
+              id="break-time"
+              value={breakTime}
+              onChange={(e) => updateBreakTime(parseInt(e.target.value))}
+            />
+          </div>
         </div>
 
         <div className="min-w-[300px]">
