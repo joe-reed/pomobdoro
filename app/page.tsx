@@ -308,8 +308,16 @@ function Home() {
               <div className="font-semibold text-3xl">Time to take a break</div>
             ) : (
               <div>
-                <h3 className="font-bold">Driver</h3>
-                <p className="font-semibold text-4xl">{currentParticipant}</p>
+                {currentParticipant ? (
+                  <>
+                    <h3 className="font-bold">Driver</h3>
+                    <p className="font-semibold text-4xl">
+                      {currentParticipant}
+                    </p>
+                  </>
+                ) : (
+                  <p>Add participants to get started with a driver!</p>
+                )}
               </div>
             )}
           </div>
