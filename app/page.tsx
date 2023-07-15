@@ -6,37 +6,88 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const DEFAULT_WORKING_TIME = 25 * 60;
 const DEFAULT_BREAK_TIME = 5 * 60;
 
+type State = {
+  participants: string[];
+  currentParticipant: string | null;
+  timerRunning: boolean;
+  onBreak: boolean;
+  workingTime: number;
+  breakTime: number;
+  timeRemaining: number;
+};
+
+type SharingState = State & { currentTime: number };
+
+function useLoadState(): State {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const encodedState = searchParams.get("state");
+
+  if (encodedState) {
+    const state = JSON.parse(atob(encodedState));
+
+    localStorage.setItem("participants", JSON.stringify(state.participants));
+    localStorage.setItem("currentParticipant", state.currentParticipant);
+    localStorage.setItem("timerRunning", JSON.stringify(state.timerRunning));
+    localStorage.setItem("onBreak", JSON.stringify(state.onBreak));
+    localStorage.setItem("workingTime", state.workingTime);
+    localStorage.setItem("breakTime", state.breakTime);
+    localStorage.setItem(
+      "timeRemaining",
+      (
+        state.timeRemaining -
+        (Date.now() - state.currentTime) / 1000
+      ).toString(),
+    );
+
+    router.replace("/");
+  }
+
+  return {
+    participants: JSON.parse(localStorage.getItem("participants") ?? "[]"),
+    currentParticipant: localStorage.getItem("currentParticipant") || null,
+    timerRunning: JSON.parse(localStorage.getItem("timerRunning") || "false"),
+    onBreak: JSON.parse(localStorage.getItem("onBreak") || "false"),
+    workingTime: parseInt(
+      localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString(),
+    ),
+    breakTime: parseInt(
+      localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString(),
+    ),
+    timeRemaining: parseInt(
+      localStorage.getItem("timeRemaining") || DEFAULT_WORKING_TIME.toString(),
+    ),
+  };
+}
+
 function Home() {
   const [name, setName] = React.useState("");
+
+  const state = useLoadState();
+
   const [participants, setParticipants] = React.useState<string[]>(
-    JSON.parse(localStorage.getItem("participants") || "[]"),
+    state.participants,
   );
   const [currentParticipant, setCurrentParticipant] = React.useState<
     string | null
-  >(localStorage.getItem("currentParticipant") || participants[0]);
+  >(state.currentParticipant);
   const [timerRunning, setTimerRunning] = React.useState<boolean>(
-    JSON.parse(localStorage.getItem("timerRunning") || "false"),
+    state.timerRunning,
   );
-  const [onBreak, setOnBreak] = React.useState<boolean>(
-    JSON.parse(localStorage.getItem("onBreak") || "false"),
-  );
+  const [onBreak, setOnBreak] = React.useState<boolean>(state.onBreak);
   const [workingTime, setWorkingTime] = React.useState<number>(
-    parseInt(
-      localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString(),
-    ),
+    state.workingTime,
   );
-  const [breakTime, setBreakTime] = React.useState<number>(
-    parseInt(
-      localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString(),
-    ),
-  );
+  const [breakTime, setBreakTime] = React.useState<number>(state.breakTime);
   const [timeRemaining, setTimeRemaining] = React.useState<number>(
-    parseInt(localStorage.getItem("timeRemaining") || workingTime.toString()),
+    state.timeRemaining,
   );
 
   function addParticipant(e: React.FormEvent<HTMLFormElement>) {
@@ -191,6 +242,28 @@ function Home() {
     return parseInt(input);
   }
 
+  const [copying, setCopying] = React.useState(false);
+  function copyShareLink() {
+    setCopying(true);
+
+    const state: SharingState = {
+      participants,
+      currentParticipant,
+      timerRunning,
+      onBreak,
+      workingTime,
+      breakTime,
+      timeRemaining,
+      currentTime: Date.now(),
+    };
+
+    navigator.clipboard.writeText(
+      window.location.href + `?state=${btoa(JSON.stringify(state))}`,
+    );
+
+    setTimeout(() => setCopying(false), 5000);
+  }
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-4xl font-bold mb-8">Pomobdoro</h1>
@@ -260,7 +333,7 @@ function Home() {
             </div>
           </fieldset>
 
-          <fieldset className="w-1/2 mb-3">
+          <fieldset className="w-1/2 mb-8">
             <legend className="mb-1">Break time</legend>
 
             <div className="flex space-x-2">
@@ -292,6 +365,11 @@ function Home() {
               </Label>
             </div>
           </fieldset>
+
+          <Button onClick={copyShareLink} className="mx-auto">
+            Copy share link
+            {copying && <Check className="ml-2" size={16} strokeWidth={3} />}
+          </Button>
         </div>
 
         <div className="w-1/2">
