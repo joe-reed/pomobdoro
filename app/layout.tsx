@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Pomobdoro",
-  description: "A tool for using pomodoro for mob programming rotations",
+  description: "A tool for rotating mob programming participants on a pomodoro timer.",
   viewport: {
     width: "device-width",
     initialScale: 1,
