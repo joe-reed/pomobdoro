@@ -173,11 +173,11 @@ function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col p-24">
-      <h1 className="text-4xl font-bold mb-8">Pomobdoro</h1>
+    <main className="flex min-h-screen flex-col py-12 md:p-24">
+      <h1 className="text-center md:text-left text-4xl font-bold mb-8">Pomobdoro</h1>
 
-      <div className="flex">
-        <div className="w-1/2">
+      <div className="flex flex-col-reverse align-center md:flex-row">
+        <div className="flex flex-col items-center md:items-start md:w-1/2">
           <form onSubmit={addParticipant} className="mb-5">
             <div className="flex space-x-4 items-end">
               <div className="flex flex-col">
@@ -205,14 +205,14 @@ function Home() {
 
           <TimeInput label="Break time" value={breakTime} onChange={updateBreakTime} className="w-1/2 mb-8" />
 
-          <Button onClick={copyShareLink} className="mx-auto">
+          <Button onClick={copyShareLink}>
             Copy share link
             {copying && <Check className="ml-2" size={16} strokeWidth={3} />}
           </Button>
         </div>
 
-        <div className="w-1/2">
-          <div className="mb-8 text-center w-1/3">
+        <div className="flex flex-col items-center md:items-start mb-16 mx-auto md:mb-0 md:mx-0 md:w-1/2">
+          <div className="mb-8 text-center md:w-1/3">
             <p className="text-6xl font-bold">{`${getMinutes(timeRemaining).toString().padStart(2, "0")}:${getSeconds(
               timeRemaining,
             )
@@ -220,9 +220,9 @@ function Home() {
               .padStart(2, "0")}`}</p>
           </div>
 
-          <div className="flex h-1/3 w-1/3 justify-around text-center">
+          <div className="flex h-1/3 w-64 md:w-1/3 justify-around text-center mb-3 md:mb-0">
             {onBreak ? (
-              <div className="font-semibold text-3xl">Time to take a break</div>
+              <div className="font-semibold md:text-3xl">Time to take a break</div>
             ) : (
               <div>
                 {currentParticipant ? (
@@ -237,12 +237,12 @@ function Home() {
             )}
           </div>
 
-          <Button onClick={toggleTimerRunning} className="mb-3 w-1/3">
+          <Button onClick={toggleTimerRunning} className="mb-3 w-64 md:w-1/3">
             {timerRunning ? "Pause" : "Start"}
           </Button>
 
-          <div className="flex w-1/3 justify-around">
-            <Button onClick={reset} className="flex" variant="secondary">
+          <div className="flex w-full md:w-1/3 justify-around">
+            <Button onClick={reset} variant="secondary">
               Reset
             </Button>
 
