@@ -97,9 +97,25 @@ function Home() {
     localStorage.setItem("workingTime", newWorkingTime.toString());
   }
 
+  function updateWorkingTimeMinutes(minutes: number) {
+    updateWorkingTime((minutes ?? 0) * 60 + getSeconds(workingTime));
+  }
+
+  function updateWorkingTimeSeconds(seconds: number) {
+    updateWorkingTime(getMinutes(workingTime) * 60 + (seconds ?? 0));
+  }
+
   function updateBreakTime(newBreakTime: number) {
     setBreakTime(newBreakTime);
     localStorage.setItem("breakTime", newBreakTime.toString());
+  }
+
+  function updateBreakTimeMinutes(minutes: number) {
+    updateBreakTime((minutes ?? 0) * 60 + getSeconds(breakTime));
+  }
+
+  function updateBreakTimeSeconds(seconds: number) {
+    updateBreakTime(getMinutes(breakTime) * 60 + (seconds ?? 0));
   }
 
   function updateTimeRemaining(newTimeRemaining: number) {
@@ -134,6 +150,14 @@ function Home() {
 
     return () => clearInterval(interval);
   });
+
+  function getMinutes(time: number) {
+    return Math.floor(time / 60);
+  }
+
+  function getSeconds(time: number) {
+    return time % 60;
+  }
 
   return (
     <main className="flex min-h-screen flex-col p-24">
@@ -173,34 +197,70 @@ function Home() {
             ))}
           </ul>
 
-          <div>
-            <Label htmlFor="working-time">Working time</Label>
-            <Input
-              type="number"
-              id="working-time"
-              value={workingTime}
-              onChange={(e) => updateWorkingTime(parseInt(e.target.value))}
-            />
-          </div>
+          <fieldset className="mb-3 w-1/2">
+            <legend className="mb-1">Working time</legend>
 
-          <div>
-            <Label htmlFor="break-time">Break time</Label>
-            <Input
-              type="number"
-              id="break-time"
-              value={breakTime}
-              onChange={(e) => updateBreakTime(parseInt(e.target.value))}
-            />
-          </div>
+            <div className="flex space-x-2">
+              <Label>
+                <div className="mb-1">Minutes</div>
+                <Input
+                  type="number"
+                  value={getMinutes(workingTime)}
+                  min={0}
+                  onChange={(e) =>
+                    updateWorkingTimeMinutes(parseInt(e.target.value))
+                  }
+                />
+              </Label>
+              <Label>
+                <div className="mb-1">Seconds</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={getSeconds(workingTime)}
+                  onChange={(e) =>
+                    updateWorkingTimeSeconds(parseInt(e.target.value))
+                  }
+                />
+              </Label>
+            </div>
+          </fieldset>
+
+          <fieldset className="w-1/2">
+            <legend className="mb-1">Break time</legend>
+
+            <div className="flex space-x-2">
+              <Label>
+                <div className="mb-1">Minutes</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={getMinutes(breakTime)}
+                  onChange={(e) =>
+                    updateBreakTimeMinutes(parseInt(e.target.value))
+                  }
+                />
+              </Label>
+              <Label>
+                <div className="mb-1">Seconds</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={getSeconds(breakTime)}
+                  onChange={(e) =>
+                    updateBreakTimeSeconds(parseInt(e.target.value))
+                  }
+                />
+              </Label>
+            </div>
+          </fieldset>
         </div>
 
         <div className="min-w-[300px]">
           <div className="mb-8 flex justify-between items-center">
-            <p className="text-4xl font-bold">{`${Math.floor(
-              (timeRemaining % 3600) / 60,
-            )
+            <p className="text-4xl font-bold">{`${getMinutes(timeRemaining)
               .toString()
-              .padStart(2, "0")}:${Math.floor(timeRemaining % 60)
+              .padStart(2, "0")}:${getSeconds(timeRemaining)
               .toString()
               .padStart(2, "0")}`}</p>
             <Button onClick={toggleTimerRunning}>
