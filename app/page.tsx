@@ -281,15 +281,15 @@ function Home() {
         </div>
 
         <div className="w-1/2">
-          <div className="mb-8 flex justify-between items-center">
-            <p className="text-4xl font-bold">{`${getMinutes(timeRemaining)
+          <div className="mb-8 text-center w-1/3">
+            <p className="text-6xl font-bold">{`${getMinutes(timeRemaining)
               .toString()
               .padStart(2, "0")}:${getSeconds(timeRemaining)
               .toString()
               .padStart(2, "0")}`}</p>
           </div>
 
-          <div className="mb-8 h-1/3">
+          <div className="flex h-1/3 w-1/3 justify-around text-center">
             {onBreak ? (
               <div className="font-semibold text-3xl">Time to take a break</div>
             ) : (
