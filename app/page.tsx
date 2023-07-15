@@ -9,6 +9,8 @@ import dynamic from "next/dynamic";
 import { Check, X } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { simulateElapsedTime } from "../lib/simulateElapsedTime";
+import { TimeInput } from "../components/TimeInput";
+import { getMinutes, getSeconds } from "../lib/time";
 
 const DEFAULT_WORKING_TIME = 25 * 60;
 const DEFAULT_BREAK_TIME = 5 * 60;
@@ -88,25 +90,9 @@ function Home() {
     localStorage.setItem("workingTime", newWorkingTime.toString());
   }
 
-  function updateWorkingTimeMinutes(minutes: number) {
-    updateWorkingTime((minutes ?? 0) * 60 + getSeconds(workingTime));
-  }
-
-  function updateWorkingTimeSeconds(seconds: number) {
-    updateWorkingTime(getMinutes(workingTime) * 60 + (seconds ?? 0));
-  }
-
   function updateBreakTime(newBreakTime: number) {
     setBreakTime(newBreakTime);
     localStorage.setItem("breakTime", newBreakTime.toString());
-  }
-
-  function updateBreakTimeMinutes(minutes: number) {
-    updateBreakTime((minutes ?? 0) * 60 + getSeconds(breakTime));
-  }
-
-  function updateBreakTimeSeconds(seconds: number) {
-    updateBreakTime(getMinutes(breakTime) * 60 + (seconds ?? 0));
   }
 
   function updateTimeRemaining(newTimeRemaining: number) {
@@ -153,14 +139,6 @@ function Home() {
     return () => clearInterval(interval);
   });
 
-  function getMinutes(time: number) {
-    return Math.floor(time / 60);
-  }
-
-  function getSeconds(time: number) {
-    return time % 60;
-  }
-
   function reset() {
     setOnBreak(false);
     updateTimeRemaining(workingTime);
@@ -172,14 +150,6 @@ function Home() {
 
   function skip() {
     toggleBreakOrWork();
-  }
-
-  function parseNumberInput(input: string): number {
-    if (input == "") {
-      return 0;
-    }
-
-    return parseInt(input);
   }
 
   const [copying, setCopying] = React.useState(false);
@@ -231,55 +201,9 @@ function Home() {
             ))}
           </ul>
 
-          <fieldset className="w-1/2 mb-3">
-            <legend className="mb-1">Working time</legend>
+          <TimeInput label="Working time" value={workingTime} onChange={updateWorkingTime} className="w-1/2 mb-3" />
 
-            <div className="flex space-x-2">
-              <Label>
-                <div className="mb-1">Minutes</div>
-                <Input
-                  type="number"
-                  value={getMinutes(workingTime)}
-                  min={0}
-                  onChange={(e) => updateWorkingTimeMinutes(parseNumberInput(e.target.value))}
-                />
-              </Label>
-              <Label>
-                <div className="mb-1">Seconds</div>
-                <Input
-                  type="number"
-                  min={0}
-                  value={getSeconds(workingTime)}
-                  onChange={(e) => updateWorkingTimeSeconds(parseNumberInput(e.target.value ?? "0"))}
-                />
-              </Label>
-            </div>
-          </fieldset>
-
-          <fieldset className="w-1/2 mb-8">
-            <legend className="mb-1">Break time</legend>
-
-            <div className="flex space-x-2">
-              <Label>
-                <div className="mb-1">Minutes</div>
-                <Input
-                  type="number"
-                  min={0}
-                  value={getMinutes(breakTime)}
-                  onChange={(e) => updateBreakTimeMinutes(parseNumberInput(e.target.value ?? "0"))}
-                />
-              </Label>
-              <Label>
-                <div className="mb-1">Seconds</div>
-                <Input
-                  type="number"
-                  min={0}
-                  value={getSeconds(breakTime)}
-                  onChange={(e) => updateBreakTimeSeconds(parseNumberInput(e.target.value ?? "0"))}
-                />
-              </Label>
-            </div>
-          </fieldset>
+          <TimeInput label="Break time" value={breakTime} onChange={updateBreakTime} className="w-1/2 mb-8" />
 
           <Button onClick={copyShareLink} className="mx-auto">
             Copy share link
