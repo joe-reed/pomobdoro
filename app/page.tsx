@@ -159,6 +159,15 @@ function Home() {
     return time % 60;
   }
 
+  function reset() {
+    setOnBreak(false);
+    updateTimeRemaining(workingTime);
+
+    if (timerRunning) {
+      toggleTimerRunning();
+    }
+  }
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-4xl font-bold mb-8">Pomobdoro</h1>
@@ -197,7 +206,7 @@ function Home() {
             ))}
           </ul>
 
-          <fieldset className="mb-3 w-1/2">
+          <fieldset className="w-1/2 mb-3">
             <legend className="mb-1">Working time</legend>
 
             <div className="flex space-x-2">
@@ -226,7 +235,7 @@ function Home() {
             </div>
           </fieldset>
 
-          <fieldset className="w-1/2">
+          <fieldset className="w-1/2 mb-3">
             <legend className="mb-1">Break time</legend>
 
             <div className="flex space-x-2">
@@ -256,7 +265,7 @@ function Home() {
           </fieldset>
         </div>
 
-        <div className="min-w-[300px]">
+        <div className="min-w-[300px] mr-3">
           <div className="mb-8 flex justify-between items-center">
             <p className="text-4xl font-bold">{`${getMinutes(timeRemaining)
               .toString()
@@ -277,6 +286,10 @@ function Home() {
               </div>
             )}
           </p>
+        </div>
+
+        <div>
+          <Button onClick={reset}>Reset</Button>
         </div>
       </div>
     </main>
