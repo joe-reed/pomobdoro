@@ -5,18 +5,24 @@ import React from "react";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 
-export default function Home() {
+function Home() {
   const [name, setName] = React.useState("");
-  const [participants, setParticipants] = React.useState<string[]>([]);
+  const [participants, setParticipants] = React.useState<string[]>(
+    JSON.parse(localStorage.getItem("participants") || "[]"),
+  );
 
   function addParticipant(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!name) return;
 
-    setParticipants((participants) => [...participants, name]);
+    const newParticipants = [...participants, name];
+    setParticipants(newParticipants);
     setName("");
+
+    localStorage.setItem("participants", JSON.stringify(newParticipants));
   }
 
   return (
@@ -47,3 +53,7 @@ export default function Home() {
     </main>
   );
 }
+
+export default dynamic(() => Promise.resolve(Home), {
+  ssr: false,
+});
