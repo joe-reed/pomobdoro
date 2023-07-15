@@ -183,6 +183,14 @@ function Home() {
     toggleBreakOrWork();
   }
 
+  function parseNumberInput(input: string): number {
+    if (input == "") {
+      return 0;
+    }
+
+    return parseInt(input);
+  }
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <h1 className="text-4xl font-bold mb-8">Pomobdoro</h1>
@@ -232,7 +240,7 @@ function Home() {
                   value={getMinutes(workingTime)}
                   min={0}
                   onChange={(e) =>
-                    updateWorkingTimeMinutes(parseInt(e.target.value))
+                    updateWorkingTimeMinutes(parseNumberInput(e.target.value))
                   }
                 />
               </Label>
@@ -243,7 +251,9 @@ function Home() {
                   min={0}
                   value={getSeconds(workingTime)}
                   onChange={(e) =>
-                    updateWorkingTimeSeconds(parseInt(e.target.value))
+                    updateWorkingTimeSeconds(
+                      parseNumberInput(e.target.value ?? "0"),
+                    )
                   }
                 />
               </Label>
@@ -261,7 +271,9 @@ function Home() {
                   min={0}
                   value={getMinutes(breakTime)}
                   onChange={(e) =>
-                    updateBreakTimeMinutes(parseInt(e.target.value))
+                    updateBreakTimeMinutes(
+                      parseNumberInput(e.target.value ?? "0"),
+                    )
                   }
                 />
               </Label>
@@ -272,7 +284,9 @@ function Home() {
                   min={0}
                   value={getSeconds(breakTime)}
                   onChange={(e) =>
-                    updateBreakTimeSeconds(parseInt(e.target.value))
+                    updateBreakTimeSeconds(
+                      parseNumberInput(e.target.value ?? "0"),
+                    )
                   }
                 />
               </Label>
