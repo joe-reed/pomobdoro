@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import { Check, X } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { simulateElapsedTime } from "../lib/simulateElapsedTime";
 
 const DEFAULT_WORKING_TIME = 25 * 60;
 const DEFAULT_BREAK_TIME = 5 * 60;
@@ -23,37 +24,6 @@ type State = {
 };
 
 type SharingState = State & { currentTime: number };
-
-function useLoadState(): State {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const encodedState = searchParams.get("state");
-
-  if (encodedState) {
-    const state = JSON.parse(atob(encodedState));
-
-    localStorage.setItem("participants", JSON.stringify(state.participants));
-    localStorage.setItem("currentParticipant", state.currentParticipant);
-    localStorage.setItem("timerRunning", JSON.stringify(state.timerRunning));
-    localStorage.setItem("onBreak", JSON.stringify(state.onBreak));
-    localStorage.setItem("workingTime", state.workingTime);
-    localStorage.setItem("breakTime", state.breakTime);
-    localStorage.setItem("timeRemaining", (state.timeRemaining - (Date.now() - state.currentTime) / 1000).toString());
-
-    router.replace("/");
-  }
-
-  return {
-    participants: JSON.parse(localStorage.getItem("participants") ?? "[]"),
-    currentParticipant: localStorage.getItem("currentParticipant") || null,
-    timerRunning: JSON.parse(localStorage.getItem("timerRunning") || "false"),
-    onBreak: JSON.parse(localStorage.getItem("onBreak") || "false"),
-    workingTime: parseInt(localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString()),
-    breakTime: parseInt(localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString()),
-    timeRemaining: parseInt(localStorage.getItem("timeRemaining") || DEFAULT_WORKING_TIME.toString()),
-  };
-}
 
 function Home() {
   const [name, setName] = React.useState("");
@@ -229,7 +199,7 @@ function Home() {
 
     navigator.clipboard.writeText(window.location.href + `?state=${btoa(JSON.stringify(state))}`);
 
-    setTimeout(() => setCopying(false), 5000);
+    setTimeout(() => setCopying(false), 3000);
   }
 
   return (
@@ -360,6 +330,41 @@ function Home() {
       </div>
     </main>
   );
+}
+
+function useLoadState(): State {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const encodedState = searchParams.get("state");
+
+  if (encodedState) {
+    const state = JSON.parse(atob(encodedState));
+
+    const { onBreak, currentParticipant, timeRemaining } = simulateElapsedTime(state);
+
+    localStorage.setItem("participants", JSON.stringify(state.participants));
+    if (currentParticipant) {
+      localStorage.setItem("currentParticipant", currentParticipant);
+    }
+    localStorage.setItem("timerRunning", JSON.stringify(state.timerRunning));
+    localStorage.setItem("onBreak", JSON.stringify(onBreak));
+    localStorage.setItem("workingTime", state.workingTime);
+    localStorage.setItem("breakTime", state.breakTime);
+    localStorage.setItem("timeRemaining", timeRemaining.toString());
+
+    router.replace("/");
+  }
+
+  return {
+    participants: JSON.parse(localStorage.getItem("participants") || "[]"),
+    currentParticipant: localStorage.getItem("currentParticipant") || null,
+    timerRunning: JSON.parse(localStorage.getItem("timerRunning") || "false"),
+    onBreak: JSON.parse(localStorage.getItem("onBreak") || "false"),
+    workingTime: parseInt(localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString()),
+    breakTime: parseInt(localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString()),
+    timeRemaining: parseInt(localStorage.getItem("timeRemaining") || DEFAULT_WORKING_TIME.toString()),
+  };
 }
 
 export default dynamic(() => Promise.resolve(Home), {
