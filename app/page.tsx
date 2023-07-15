@@ -39,13 +39,7 @@ function useLoadState(): State {
     localStorage.setItem("onBreak", JSON.stringify(state.onBreak));
     localStorage.setItem("workingTime", state.workingTime);
     localStorage.setItem("breakTime", state.breakTime);
-    localStorage.setItem(
-      "timeRemaining",
-      (
-        state.timeRemaining -
-        (Date.now() - state.currentTime) / 1000
-      ).toString(),
-    );
+    localStorage.setItem("timeRemaining", (state.timeRemaining - (Date.now() - state.currentTime) / 1000).toString());
 
     router.replace("/");
   }
@@ -55,15 +49,9 @@ function useLoadState(): State {
     currentParticipant: localStorage.getItem("currentParticipant") || null,
     timerRunning: JSON.parse(localStorage.getItem("timerRunning") || "false"),
     onBreak: JSON.parse(localStorage.getItem("onBreak") || "false"),
-    workingTime: parseInt(
-      localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString(),
-    ),
-    breakTime: parseInt(
-      localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString(),
-    ),
-    timeRemaining: parseInt(
-      localStorage.getItem("timeRemaining") || DEFAULT_WORKING_TIME.toString(),
-    ),
+    workingTime: parseInt(localStorage.getItem("workingTime") || DEFAULT_WORKING_TIME.toString()),
+    breakTime: parseInt(localStorage.getItem("breakTime") || DEFAULT_BREAK_TIME.toString()),
+    timeRemaining: parseInt(localStorage.getItem("timeRemaining") || DEFAULT_WORKING_TIME.toString()),
   };
 }
 
@@ -72,23 +60,13 @@ function Home() {
 
   const state = useLoadState();
 
-  const [participants, setParticipants] = React.useState<string[]>(
-    state.participants,
-  );
-  const [currentParticipant, setCurrentParticipant] = React.useState<
-    string | null
-  >(state.currentParticipant);
-  const [timerRunning, setTimerRunning] = React.useState<boolean>(
-    state.timerRunning,
-  );
+  const [participants, setParticipants] = React.useState<string[]>(state.participants);
+  const [currentParticipant, setCurrentParticipant] = React.useState<string | null>(state.currentParticipant);
+  const [timerRunning, setTimerRunning] = React.useState<boolean>(state.timerRunning);
   const [onBreak, setOnBreak] = React.useState<boolean>(state.onBreak);
-  const [workingTime, setWorkingTime] = React.useState<number>(
-    state.workingTime,
-  );
+  const [workingTime, setWorkingTime] = React.useState<number>(state.workingTime);
   const [breakTime, setBreakTime] = React.useState<number>(state.breakTime);
-  const [timeRemaining, setTimeRemaining] = React.useState<number>(
-    state.timeRemaining,
-  );
+  const [timeRemaining, setTimeRemaining] = React.useState<number>(state.timeRemaining);
 
   function addParticipant(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -114,26 +92,18 @@ function Home() {
     localStorage.setItem("participants", JSON.stringify(newParticipants));
 
     if (currentParticipant === participant) {
-      updateCurrentParticipant(
-        newParticipants[participantIndex] ||
-          newParticipants[participantIndex - 1] ||
-          null,
-      );
+      updateCurrentParticipant(newParticipants[participantIndex] || newParticipants[participantIndex - 1] || null);
     }
   }
 
   function rotateCurrentParticipant() {
     if (!participants.length) return;
 
-    const currentParticipantIndex = currentParticipant
-      ? participants.indexOf(currentParticipant)
-      : 0;
+    const currentParticipantIndex = currentParticipant ? participants.indexOf(currentParticipant) : 0;
     const nextParticipantIndex = currentParticipantIndex + 1;
 
     const nextParticipant =
-      nextParticipantIndex >= participants.length
-        ? participants[0]
-        : participants[nextParticipantIndex];
+      nextParticipantIndex >= participants.length ? participants[0] : participants[nextParticipantIndex];
 
     updateCurrentParticipant(nextParticipant);
   }
@@ -257,9 +227,7 @@ function Home() {
       currentTime: Date.now(),
     };
 
-    navigator.clipboard.writeText(
-      window.location.href + `?state=${btoa(JSON.stringify(state))}`,
-    );
+    navigator.clipboard.writeText(window.location.href + `?state=${btoa(JSON.stringify(state))}`);
 
     setTimeout(() => setCopying(false), 5000);
   }
@@ -276,12 +244,7 @@ function Home() {
                 <Label htmlFor="name" className="mb-3">
                   Add a participant
                 </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <Input id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <Button type="submit">Add</Button>
             </div>
@@ -292,11 +255,7 @@ function Home() {
               <li key={participant}>
                 <div className="flex items-center">
                   <p className="mr-4">{participant}</p>
-                  <X
-                    className="mt-[1px]"
-                    size={16}
-                    onClick={() => removeParticipant(participant)}
-                  />
+                  <X className="mt-[1px]" size={16} onClick={() => removeParticipant(participant)} />
                 </div>
               </li>
             ))}
@@ -312,9 +271,7 @@ function Home() {
                   type="number"
                   value={getMinutes(workingTime)}
                   min={0}
-                  onChange={(e) =>
-                    updateWorkingTimeMinutes(parseNumberInput(e.target.value))
-                  }
+                  onChange={(e) => updateWorkingTimeMinutes(parseNumberInput(e.target.value))}
                 />
               </Label>
               <Label>
@@ -323,11 +280,7 @@ function Home() {
                   type="number"
                   min={0}
                   value={getSeconds(workingTime)}
-                  onChange={(e) =>
-                    updateWorkingTimeSeconds(
-                      parseNumberInput(e.target.value ?? "0"),
-                    )
-                  }
+                  onChange={(e) => updateWorkingTimeSeconds(parseNumberInput(e.target.value ?? "0"))}
                 />
               </Label>
             </div>
@@ -343,11 +296,7 @@ function Home() {
                   type="number"
                   min={0}
                   value={getMinutes(breakTime)}
-                  onChange={(e) =>
-                    updateBreakTimeMinutes(
-                      parseNumberInput(e.target.value ?? "0"),
-                    )
-                  }
+                  onChange={(e) => updateBreakTimeMinutes(parseNumberInput(e.target.value ?? "0"))}
                 />
               </Label>
               <Label>
@@ -356,11 +305,7 @@ function Home() {
                   type="number"
                   min={0}
                   value={getSeconds(breakTime)}
-                  onChange={(e) =>
-                    updateBreakTimeSeconds(
-                      parseNumberInput(e.target.value ?? "0"),
-                    )
-                  }
+                  onChange={(e) => updateBreakTimeSeconds(parseNumberInput(e.target.value ?? "0"))}
                 />
               </Label>
             </div>
@@ -374,9 +319,9 @@ function Home() {
 
         <div className="w-1/2">
           <div className="mb-8 text-center w-1/3">
-            <p className="text-6xl font-bold">{`${getMinutes(timeRemaining)
-              .toString()
-              .padStart(2, "0")}:${getSeconds(timeRemaining)
+            <p className="text-6xl font-bold">{`${getMinutes(timeRemaining).toString().padStart(2, "0")}:${getSeconds(
+              timeRemaining,
+            )
               .toString()
               .padStart(2, "0")}`}</p>
           </div>
@@ -389,9 +334,7 @@ function Home() {
                 {currentParticipant ? (
                   <>
                     <h3 className="font-bold">Driver</h3>
-                    <p className="font-semibold text-4xl">
-                      {currentParticipant}
-                    </p>
+                    <p className="font-semibold text-4xl">{currentParticipant}</p>
                   </>
                 ) : (
                   <p>Add participants to get started with a driver!</p>
